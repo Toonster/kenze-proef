@@ -14,23 +14,22 @@ public static class WordCombinationsFinder
                 continue;
             }
 
+            var combination = new PartCombination(new List<Part> {firstPart});
             foreach (var secondPart in parts)
             {
-                var combination = new PartCombination(new List<Part> {firstPart, secondPart});
-                if (!word.IsCombinationCorrectLength(combination))
+                combination = combination.AddPart(secondPart);
+                if (!word.IsCombinationCorrectLength(combination) || !word.Content.Contains(secondPart.Content))
                 {
-                    continue;
-                }
-
-                if (!word.Content.Contains(secondPart.Content))
-                {
+                    combination.RemoveLastPart();
                     continue;
                 }
 
                 if (word.IsValidCombination(combination))
                 {
-                    combinations.Add(combination);
+                    combinations.Add(new PartCombination(combination.Parts.Select(part => new Part(part.Content)).ToList()));
                 }
+                
+                combination = combination.RemoveLastPart();
             }
         }
 
