@@ -14,4 +14,3 @@ var dictionaryService = app.Services.GetRequiredService<DictionaryService>();
 var dictionary = dictionaryService.CreateDictionary("..\\input.txt", 6);
 dictionary.PrintWords();
 
-app.Run();

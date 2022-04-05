@@ -8,9 +8,21 @@ public record Word(string Content, IEnumerable<PartCombination> Combinations)
 
         return word.Equals(Content);
     }
-
-    public bool IsCombinationCorrectLength(PartCombination combination)
+    
+    public bool IsValidCombination(IEnumerable<Part> combination)
     {
-        return Content.Length == combination.TotalLength();
+        var word = combination.Aggregate("", (current, part) => current + part.Content);
+
+        return word.Equals(Content);
+    }
+
+    public bool IsCombinationCorrectLength(IEnumerable<Part> combination)
+    {
+        return Content.Length == combination.Sum(part => part.Content.Length);
+    }
+
+    public bool Contains(Part part)
+    {
+        return Content.Contains(part.Content);
     }
 };

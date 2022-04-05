@@ -25,4 +25,4 @@ public record PartCombination(List<Part> Parts)
         
         return new PartCombination(Parts);
     }
-};
+}

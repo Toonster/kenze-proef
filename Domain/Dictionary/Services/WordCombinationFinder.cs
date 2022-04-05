@@ -1,4 +1,5 @@
-﻿using Domain.Dictionary.ValueObjects;
+﻿using System.Collections;
+using Domain.Dictionary.ValueObjects;
 
 namespace Domain.Dictionary.Services;
 
@@ -13,26 +14,34 @@ public static class WordCombinationsFinder
             {
                 continue;
             }
-
-            var combination = new PartCombination(new List<Part> {firstPart});
+            
+            var combination = new List<Part>{ firstPart };
             foreach (var secondPart in parts)
             {
-                combination = combination.AddPart(secondPart);
-                if (!word.IsCombinationCorrectLength(combination) || !word.Content.Contains(secondPart.Content))
+                if (combination.Count > 1)
                 {
-                    combination.RemoveLastPart();
+                    RemoveLastPart(combination);
+                }
+                
+                combination.Add(secondPart);
+
+                if (!word.Contains(secondPart) || !word.IsCombinationCorrectLength(combination))
+                {
                     continue;
                 }
 
                 if (word.IsValidCombination(combination))
                 {
-                    combinations.Add(new PartCombination(combination.Parts.Select(part => new Part(part.Content)).ToList()));
+                    combinations.Add(new PartCombination(combination.Select(part => new Part(part.Content)).ToList()));
                 }
-                
-                combination = combination.RemoveLastPart();
             }
         }
 
         return combinations;
+    }
+
+    private static void RemoveLastPart(IList combination)
+    {
+        combination.RemoveAt(combination.Count - 1);
     }
 }
