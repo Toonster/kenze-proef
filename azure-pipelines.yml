@@ -8,15 +8,15 @@ variables:
 - name: BuildParameters.RestoreBuildProjects
   value: '**/*.csproj'
 trigger:
-- main
+- master
 pr:
-- main
+- master
 name: $(date:yyyyMMdd)$(rev:.r)
 resources:
   repositories:
     - repository: self
       type: git
-      ref: refs/heads/main
+      ref: refs/heads/master
 stages:
 - stage: Build_Test_Publish
   jobs:
@@ -43,7 +43,7 @@ stages:
           inputs:
             command: test 
         - task: DotNetCoreCLI@2
-          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
           displayName: Publish
           inputs:
             command: publish
@@ -51,7 +51,7 @@ stages:
             zipAfterPublish: true
             arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
         - task: PublishBuildArtifacts@1
-          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
           displayName: Publish artifact
           inputs:
             PathtoPublish: '$(Build.ArtifactStagingDirectory)'
