@@ -1,0 +1,62 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+variables:
+- name: BuildConfiguration
+  value: 'Release'
+- name: BuildParameters.RestoreBuildProjects
+  value: '**/*.csproj'
+trigger:
+- main
+pr:
+- main
+name: $(date:yyyyMMdd)$(rev:.r)
+resources:
+  repositories:
+    - repository: self
+      type: git
+      ref: refs/heads/main
+stages:
+- stage: Build_Test_Publish
+  jobs:
+    - job: Job_1
+      displayName: CI 
+      pool:
+        vmImage: windows-latest
+      steps:
+        - checkout: self
+          clean: true
+        - task: UseDotNet@2
+          displayName: Use .NET Core sdk 7.0.x
+          inputs:
+            version: 7.0.x
+            includePreviewVersions: true
+        - task: DotNetCoreCLI@2
+          displayName: Restore
+          inputs:
+            command: restore
+            projects: $(BuildParameters.RestoreBuildProjects)
+        - task: DotNetCoreCLI@2
+          displayName: Build
+          inputs:
+            command: build 
+            projects: $(BuildParameters.RestoreBuildProjects)
+            arguments: --configuration $(BuildConfiguration)
+        - task: DotNetCoreCLI@2
+          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+          displayName: Publish
+          inputs:
+            command: publish
+            publishWebProjects: true
+            zipAfterPublish: true
+            arguments: --configuration $(BuildConfiguration) --output $(Build.ArtifactStagingDirectory)
+        - task: PublishBuildArtifacts@1
+          condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'))
+          displayName: Publish artifact
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+            ArtifactName: 'testApp'
+            publishLocation: 'Container'
+
+
