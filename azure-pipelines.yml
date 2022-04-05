@@ -33,11 +33,6 @@ stages:
             version: 7.0.x
             includePreviewVersions: true
         - task: DotNetCoreCLI@2
-          displayName: Restore
-          inputs:
-            command: restore
-            projects: $(BuildParameters.RestoreBuildProjects)
-        - task: DotNetCoreCLI@2
           displayName: Build
           inputs:
             command: build 
